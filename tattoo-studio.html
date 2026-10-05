@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tattoo Studio – พรอมต์ / เปลี่ยนท่าทาง / ผสมสี</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d10;--card:#17171c;--line:#2a2a33;--tx:#f2f2f5;--mu:#9a9aa8;--r:#e11d48;--o:#f97316;box-sizing:border-box}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:'Noto Sans Thai',system-ui,sans-serif;padding:env(safe-area-inset-top) 14px 40px;max-width:640px;margin:auto}
+h1{font-size:18px;margin:16px 0 2px;font-weight:800}
+h1 b{color:var(--r)}
+.sub{color:var(--mu);font-size:12px;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tabs button{flex:1 1 30%;padding:10px 4px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--mu);font:600 12px inherit;font-family:inherit;line-height:1.3}
+.tabs button.on{color:#fff;background:linear-gradient(135deg,var(--r),var(--o));border-color:transparent}
+label{display:block;font-size:12px;color:var(--mu);margin:12px 0 5px;font-weight:600}
+input[type=text],input[type=password],textarea,select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);background:#0d0d10;color:var(--tx);font:14px inherit;font-family:inherit}
+textarea{min-height:70px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:#0d0d10;color:var(--tx);font:12px inherit;font-family:inherit}
+.chip.on{border-color:var(--r);color:#fff;background:#3a0f1a}
+.btn{width:100%;padding:13px;border:0;border-radius:11px;font:700 14px inherit;font-family:inherit;color:#fff;background:linear-gradient(135deg,var(--r),var(--o));margin-top:12px}
+.btn.alt{background:#23232b;border:1px solid var(--line)}
+.row{display:flex;gap:8px}.row>*{flex:1}
+pre{white-space:pre-wrap;word-break:break-word;background:#0d0d10;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12px;color:#d6d6e0;margin:0}
+img.pv{max-width:100%;border-radius:10px;margin-top:10px;display:block}
+.drop{border:1.5px dashed var(--line);border-radius:12px;padding:16px;text-align:center;color:var(--mu);font-size:13px}
+.msg{font-size:12px;color:#fbbf24;margin-top:8px;word-break:break-word}
+.sw{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.sw i{width:44px;height:44px;border-radius:10px;border:1px solid #fff3;flex:none}
+.sw small{color:var(--mu);display:block;font-size:11px}
+.bar{height:22px;border-radius:6px;display:flex;overflow:hidden;margin:6px 0}
+.bar div{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.hide{display:none}
+</style>
+</head>
+<body>
+<h1>TATTOO<b>STUDIO</b></h1>
+<div class="sub">เครื่องมือสำหรับช่างสัก · Toolkit for tattoo artists</div>
+
+<div class="card">
+  <label style="margin-top:0">🔑 Gemini API Key (ของคุณเอง / your own)</label>
+  <input type="password" id="key" placeholder="AIza..." autocomplete="off">
+  <div class="row" style="margin-top:8px">
+    <input type="text" id="model" value="gemini-3.1-flash-image" list="ml" aria-label="model"><datalist id="ml"><option value="gemini-3.1-flash-image"><option value="gemini-3.1-flash-lite-image"><option value="gemini-3-pro-image"><option value="gemini-2.5-flash-image"></datalist><button class="chip" id="tk" style="flex:none">🔍 ทดสอบ key / Test</button>
+  </div>
+  <label style="display:flex;gap:8px;align-items:center;margin:8px 0 0;font-weight:400"><input type="checkbox" id="rem"> จำ key ในเครื่องนี้ / remember on this device</label>
+  <div class="msg" id="tkm"></div><div class="sub" style="margin:6px 0 0">Key ถูกส่งตรงไป Google เท่านั้น ไม่ผ่านเซิร์ฟเวอร์อื่น · sent only to Google.</div>
+</div>
+
+<div class="tabs">
+  <button class="on" data-t="p">✨ Master Prompt<br>สร้างพรอมต์</button>
+  <button data-t="q">🕺 Pose<br>เปลี่ยนท่าทาง</button>
+  <button data-t="c">🎨 Color Mix<br>ผสมสี</button>
+  <button data-t="s">✏️ Stencil<br>ถอดเส้นลาย</button>
+  <button data-t="t">📄 A4 Tiling<br>ตัดแบ่งภาพ</button>
+</div>
+
+<!-- PROMPT TAB -->
+<section id="p">
+ <div class="card">
+  <label style="margin-top:0">1. สไตล์ / Style</label>
+  <div class="chips" id="styles"></div>
+  <label>2. หัวข้อ / Subject</label>
+  <input type="text" id="subj" placeholder="เช่น Japanese Dragon with Cherry Blossoms, เสือ, หัวกะโหลก">
+  <label>3. ตำแหน่ง / Placement</label>
+  <select id="place"><option>Full Back (เต็มหลัง)</option><option>Chest (หน้าอก)</option><option>Full Sleeve (เต็มแขน)</option><option>Forearm (ท่อนแขน)</option><option>Thigh (ต้นขา)</option><option>Calf (น่อง)</option><option>Shoulder (ไหล่)</option></select>
+  <div class="row">
+   <div><label>เส้น / Line</label><select id="line"><option value="bold clean black outlines">Bold</option><option value="fine delicate linework">Fine</option><option value="smooth whip shading, high contrast">Shading</option></select></div>
+   <div><label>สัดส่วน / Ratio</label><select id="ar"><option>3:4</option><option>1:1</option><option>4:3</option><option>9:16</option></select></div>
+  </div>
+  <label>ภาพอ้างอิง (ไม่บังคับ) / Reference image (optional)</label>
+  <label class="drop" style="margin:0">แตะเพื่อเลือกรูป / tap to upload<input type="file" accept="image/*" id="f_p" class="hide"></label>
+  <img class="pv hide" id="i_p">
+  <button class="btn" id="b_p">⚡ สร้าง Prompt / Create Prompt</button>
+ </div>
+ <div class="card hide" id="o_p"></div>
+</section>
+
+<!-- POSE TAB -->
+<section id="q" class="hide">
+ <div class="card">
+  <label style="margin-top:0">1. อัปโหลดตัวละคร / Upload character</label>
+  <label class="drop" style="margin:0">แตะเพื่อเลือกรูป / tap to upload<input type="file" accept="image/*" id="f_q" class="hide"></label>
+  <img class="pv hide" id="i_q">
+  <label>2. สั่งท่าทางใหม่ / Pose command</label>
+  <textarea id="pose" placeholder="เช่น ยกดาบเหนือหัว, นั่งขัดสมาธิ, กระโดดต่อสู้ / e.g. sitting cross-legged, sword raised"></textarea>
+  <div class="chips" style="margin-top:8px" id="poseChips"></div>
+  <label>3. มุมมอง / View</label>
+  <select id="view"><option value="">ตามเดิม / keep original</option><option value="front view">หน้าตรง / Front</option><option value="side profile view">ด้านข้าง / Side</option><option value="back view">ด้านหลัง / Back</option><option value="three-quarter view">เฉียง 3/4 / 3-4</option></select>
+  <button class="btn" id="b_q">⚡ สร้าง Prompt / Create Prompt</button>
+ </div>
+ <div class="card hide" id="o_q"></div>
+</section>
+
+<!-- COLOR TAB -->
+<section id="c" class="hide">
+ <div class="card">
+  <label style="margin-top:0">อัปโหลดรูป / Upload image</label>
+  <label class="drop" style="margin:0">แตะเพื่อเลือกรูป / tap to upload<input type="file" accept="image/*" id="f_c" class="hide"></label>
+  <img class="pv hide" id="i_c">
+  <div class="row"><div><label>จำนวนสี / Colors</label><select id="kn"><option>4</option><option selected>6</option><option>8</option></select></div>
+  <div><label>ข้ามพื้นหลังขาว / Skip white bg</label><select id="skip"><option value="1">ใช่ / Yes</option><option value="0">ไม่ / No</option></select></div></div>
+  <button class="btn" id="b_c">🎨 วิเคราะห์สี / Analyze</button>
+ </div>
+ <div class="card hide" id="o_c"></div>
+</section>
+
+<!-- STENCIL TAB -->
+<section id="s" class="hide">
+ <div class="card">
+  <label style="margin-top:0">อัปโหลดรูปลายสัก / Upload tattoo image</label>
+  <label class="drop" style="margin:0">แตะเพื่อเลือกรูป / tap to upload<input type="file" accept="image/*" id="f_s" class="hide"></label>
+  <div class="row"><div><label>โหมด / Mode</label><select id="sm"><option value="a">เส้นคมชัด / Clean lines</option><option value="e">จับขอบ / Edges</option><option value="d">ตามความเข้ม / Darkness</option></select></div>
+  <div><label>ความหนาเส้น / Thickness</label><select id="st"><option value="0">บาง / Thin</option><option value="1" selected>กลาง / Medium</option><option value="2">หนา / Bold</option></select></div></div>
+  <label>ความไว / Sensitivity <span id="sv"></span></label><input type="range" id="sr" min="3" max="120" value="14" style="width:100%"><label>ลบจุดสกปรก / Remove specks <span id="sdv"></span></label><input type="range" id="sd" min="0" max="400" value="60" style="width:100%"><label style="display:flex;gap:8px;align-items:center;font-weight:400"><input type="checkbox" id="stp"> ดาวน์โหลดพื้นโปร่งใส / transparent PNG</label>
+  <canvas id="cv_s" style="width:100%;border-radius:10px;margin-top:10px;background:#fff" class="hide"></canvas>
+  <div class="row"><button class="btn alt" id="sdl">⬇️ ดาวน์โหลด / Download</button><button class="btn alt" id="s2t">📄 ส่งไปตัดแบ่ง / To A4</button></div>
+  <button class="btn" id="b_s">🤖 ถอดเส้นด้วย AI (Gemini) / AI line art</button>
+ </div>
+ <div class="card hide" id="o_s"></div>
+</section>
+
+<!-- TILING TAB -->
+<section id="t" class="hide">
+ <div class="card">
+  <label style="margin-top:0">อัปโหลดภาพ / Upload image</label>
+  <label class="drop" style="margin:0">แตะเพื่อเลือกรูป / tap to upload<input type="file" accept="image/*" id="f_t" class="hide"></label>
+  <img class="pv hide" id="i_t">
+  <div class="row"><div><label>คอลัมน์ / Cols</label><select id="tc"></select></div><div><label>แถว / Rows</label><select id="tr"></select></div>
+  <div><label>ขอบ / Margin</label><select id="tm"><option value="0">0 mm</option><option value="5">5 mm</option><option value="10" selected>10 mm</option><option value="15">15 mm</option></select></div></div>
+  <div class="sub" id="tinfo" style="margin-top:8px"></div>
+  <button class="btn" id="b_t">✂️ ตัดแบ่ง / Split to A4</button>
+ </div>
+ <div class="card hide" id="o_t"></div>
+</section>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+// ---- key storage
+try{const k=localStorage.getItem('gk');if(k){$('#key').value=k;$('#rem').checked=true}}catch(e){}
+function saveKey(){try{$('#rem').checked?localStorage.setItem('gk',$('#key').value.trim()):localStorage.removeItem('gk')}catch(e){}}
+$('#key').oninput=$('#rem').onchange=saveKey;
+// ---- tabs
+$$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.classList.toggle('on',x===b));['p','q','c','s','t'].forEach(t=>$('#'+t).classList.toggle('hide',t!==b.dataset.t))});
+// ---- chips
+const STYLES=[['Irezumi / ญี่ปุ่น','Japanese Irezumi traditional'],['Realism / สมจริง','photorealistic black and grey realism'],['Minimalist / มินิมอล','minimalist fine-line'],['Old School / ออลสคูล','American old school traditional'],['Geometric / เรขาคณิต','geometric dotwork'],['Tribal / ชนเผ่า','tribal blackwork']];
+let style=STYLES[0][1];
+STYLES.forEach(([l,v],i)=>{const b=document.createElement('button');b.className='chip'+(i?'':' on');b.textContent=l;b.onclick=()=>{style=v;$$('#styles .chip').forEach(x=>x.classList.toggle('on',x===b))};$('#styles').append(b)});
+['ยกมือขึ้น · raise hand','นั่ง · sitting','วิ่ง · running','ต่อสู้ · fighting stance','หันหลัง · turn around','นอน · lying down'].forEach(t=>{const b=document.createElement('button');b.className='chip';b.textContent=t;b.onclick=()=>{$('#pose').value=t.split('·')[1].trim()};$('#poseChips').append(b)});
+// ---- images
+const refs={};
+function resize(url,max=1024){return new Promise(r=>{const im=new Image();im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',.9))};im.src=url})}
+['p','q','c','s','t'].forEach(k=>$('#f_'+k).onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=async()=>{refs[k]=await resize(rd.result,k=='t'?2400:k=='s'?1600:1024);$('#i_'+k).src=refs[k];$('#i_'+k).classList.remove('hide');if(k=='s')runStencil()};rd.readAsDataURL(f)});
+// ---- output card + Gemini
+function showOut(k,prompt,ratio){
+  const o=$('#o_'+k);o.classList.remove('hide');
+  o.innerHTML='<label style="margin-top:0">PROMPT</label><pre></pre><div class="row"><button class="btn alt cp">📋 คัดลอก / Copy</button><button class="btn gn">🖼️ เจนภาพในแอป / Generate here</button></div><div class="msg"></div><div class="res"></div>';
+  o.querySelector('pre').textContent=prompt;
+  o.querySelector('.cp').onclick=async e=>{try{await navigator.clipboard.writeText(prompt);e.target.textContent='✅ Copied'}catch(x){e.target.textContent='เลือกข้อความเอง / copy manually'}};
+  o.querySelector('.gn').onclick=()=>gen(k,prompt,ratio,o);
+  o.scrollIntoView({behavior:'smooth'});
+}
+async function gen(k,prompt,ratio,o){
+  const msg=o.querySelector('.msg'),res=o.querySelector('.res'),key=$('#key').value.trim();
+  if(!key){msg.textContent='⚠️ ใส่ Gemini API key ด้านบนก่อน / Enter your Gemini API key above';return}
+  msg.textContent='⏳ กำลังสร้างภาพ… / Generating…';res.innerHTML='';
+  const parts=[{text:prompt}];
+  if(refs[k])parts.push({inlineData:{mimeType:'image/jpeg',data:refs[k].split(',')[1]}});
+  const body={contents:[{parts}],generationConfig:{responseModalities:['TEXT','IMAGE']}};
+  if(ratio)body.generationConfig.imageConfig={aspectRatio:ratio};
+  try{
+    const first=$('#model').value.trim()||'gemini-3.1-flash-image',list=[first,...['gemini-3.1-flash-image','gemini-3-pro-image','gemini-3.1-flash-lite-image','gemini-2.5-flash-image'].filter(x=>x!=first)];
+    let r,j;
+    for(const m of list){
+      msg.textContent='⏳ กำลังสร้างภาพ… / Generating… ('+m+')';
+      r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      j=await r.json();
+      if(r.ok){$('#model').value=m;break}
+      if(!(r.status==404||/not found|not supported/i.test(j.error?.message||'')))break;
+    }
+    if(!r.ok)throw new Error(j.error?.message||r.status);
+    const ps=j.candidates?.[0]?.content?.parts||[],img=ps.find(p=>(p.inlineData||p.inline_data));
+    if(!img)throw new Error(ps.map(p=>p.text).filter(Boolean).join(' ')||'No image returned');
+    const d=img.inlineData||img.inline_data,src=`data:${d.mimeType||d.mime_type};base64,${d.data}`;
+    msg.textContent='';res.innerHTML=`<img class="pv" src="${src}"><a class="btn" style="display:block;text-align:center;text-decoration:none" download="tattoo-${Date.now()}.png" href="${src}">⬇️ ดาวน์โหลด / Download</a>`;
+  }catch(e){let h='';const t=String(e.message);
+    if(e instanceof TypeError)h='\n→ เชื่อมต่อ Google ไม่ได้: ถ้าเปิดไฟล์ในพรีวิวของ Claude/แอปแชท จะถูกบล็อก ให้เปิดใน Chrome/Safari จริง หรืออัปขึ้นโฮสต์ · Network blocked: open in a real browser or host the file.';
+    else if(/quota|billing|limit|RESOURCE/i.test(t))h='\n→ โมเดลสร้างภาพมักต้องเปิด billing ใน Google AI Studio · Image models usually need billing enabled.';
+    else if(/not found|not supported|404/i.test(t))h='\n→ ชื่อโมเดลไม่ถูก กด "ทดสอบ key" เพื่อดูโมเดลที่ใช้ได้ · Wrong model: press Test to list.';
+    else if(/API key|PERMISSION|403|400/i.test(t))h='\n→ ตรวจ key อีกครั้ง · Check your key.';
+    msg.style.whiteSpace='pre-wrap';msg.textContent='❌ '+t+h}
+}
+$('#tk').onclick=async()=>{const k=$('#key').value.trim(),m=$('#tkm');if(!k){m.textContent='ใส่ key ก่อน / enter key';return}
+  m.textContent='⏳ …';try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200&key='+encodeURIComponent(k)),j=await r.json();
+  if(!r.ok)throw new Error(j.error?.message||r.status);
+  m.style.color='#4ade80';m.textContent='✅ key ใช้ได้ · โมเดลภาพ: '+(j.models.map(x=>x.name.replace('models/','')).filter(n=>/image/i.test(n)).join(', ')||'ไม่พบ / none')}
+  catch(e){m.style.color='#fbbf24';m.textContent='❌ '+(e instanceof TypeError?'เชื่อมต่อ Google ไม่ได้ (เปิดในเบราว์เซอร์จริง / open in real browser)':e.message)}};
+// ---- prompt builders
+$('#b_p').onclick=()=>{
+  const s=$('#subj').value.trim()||'Japanese Dragon with Cherry Blossoms',pl=$('#place').value.replace(/\s*\(.*\)/,''),ar=$('#ar').value;
+  const ref=refs.p?' Use the attached image as the visual reference for composition and details.':'';
+  showOut('p',`Masterpiece ${style} tattoo design of ${s}, ${pl} placement, ${$('#line').value}, symmetrical balanced composition, tattoo studio portfolio quality, high-contrast stencil-ready artwork, isolated on clean white background.${ref}`,ar);
+};
+$('#b_q').onclick=()=>{
+  const p=$('#pose').value.trim();if(!p){$('#pose').focus();return}
+  const v=$('#view').value;
+  showOut('q',`Edit the attached reference image. Keep the exact same character: identical face, hair, outfit, colors, proportions, art style, line work and background. Change ONLY the pose to: ${p}.${v?' Show the character in '+v+'.':''} Natural anatomy, full body visible, same image quality.`,null);
+};
+// ---- color analysis
+const BASE=[[0,'แดง','red'],[22,'ส้ม','orange'],[50,'เหลือง','yellow'],[85,'เขียวมะนาว','lime'],[140,'เขียว','green'],[180,'ฟ้าเขียว','cyan'],[210,'ฟ้า','sky blue'],[240,'น้ำเงิน','blue'],[275,'ม่วง','purple'],[320,'ชมพูบานเย็น','magenta'],[345,'ชมพู','pink'],[360,'แดง','red']];
+function hsv(r,g,b){r/=255;g/=255;b/=255;const M=Math.max(r,g,b),m=Math.min(r,g,b),d=M-m;let h=0;if(d){h=M==r?((g-b)/d)%6:M==g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return[h,M?d/M:0,M]}
+function name(r,g,b){const[h,s,v]=hsv(r,g,b);
+  if(v<.15)return['ดำ','black'];
+  if(s<.12)return v>.9?['ขาว','white']:v>.6?['เทาอ่อน','light grey']:v>.35?['เทา','grey']:['เทาเข้ม','dark grey'];
+  let n=BASE[0];for(const x of BASE)if(Math.abs(x[0]-h)<Math.abs(n[0]-h))n=x;
+  if(h>=15&&h<45&&v<.7&&s<.9)n=[0,'น้ำตาล','brown'];
+  let th=n[1],en=n[2];
+  if(v<.45){th+='เข้ม';en='dark '+en}else if(v>.8&&s<.45){th+='อ่อน';en='light '+en}
+  return[th,en]}
+function ryb(r,g,b){ // approximate paint mix: R/Y/B/W/K
+  const[h,s,v]=hsv(r,g,b),K=1-v,W=v*(1-s),C=v*s;let R,Y,B,t;
+  if(h<60){t=h/60;R=1-t;Y=t;B=0}else if(h<120){t=(h-60)/60;R=0;Y=1-.5*t;B=.5*t}
+  else if(h<240){t=(h-120)/120;R=0;Y=.5*(1-t);B=.5+.5*t}else if(h<300){t=(h-240)/60;R=.5*t;Y=0;B=1-.5*t}
+  else{t=(h-300)/60;R=.5+.5*t;Y=0;B=.5*(1-t)}
+  return{R:R*C,Y:Y*C,B:B*C,W,K}}
+const PC={R:['#e11d48','แดง','Red'],Y:['#facc15','เหลือง','Yellow'],B:['#2563eb','น้ำเงิน','Blue'],W:['#f5f5f5','ขาว','White'],K:['#111','ดำ','Black']};
+function recipe(o){return Object.entries(o).map(([k,v])=>[k,Math.round(v*100)]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${PC[k][1]} ${v}%`).join(' + ')}
+function bar(o){return '<div class="bar">'+Object.entries(o).filter(x=>x[1]>.005).map(([k,v])=>`<div style="width:${v*100}%;background:${PC[k][0]};color:${k=='W'||k=='Y'?'#000':'#fff'}">${v>.06?Math.round(v*100)+'%':''}</div>`).join('')+'</div>'}
+$('#b_c').onclick=()=>{
+  if(!refs.c){alert('อัปโหลดรูปก่อน / Upload an image first');return}
+  const im=new Image();im.onload=()=>{
+    const S=90,c=document.createElement('canvas');c.width=S;c.height=S;const x=c.getContext('2d');x.drawImage(im,0,0,S,S);
+    const d=x.getImageData(0,0,S,S).data,K=+$('#kn').value,skip=$('#skip').value=='1',px=[];
+    for(let i=0;i<d.length;i+=4){if(d[i+3]<128)continue;if(skip&&d[i]>240&&d[i+1]>240&&d[i+2]>240)continue;px.push([d[i],d[i+1],d[i+2]])}
+    if(!px.length){alert('ไม่พบสี / no colors found');return}
+    let cs=[];for(let i=0;i<K;i++)cs.push([...px[Math.floor((i+.5)*px.length/K)]]);
+    let as=new Array(px.length);
+    for(let it=0;it<10;it++){
+      px.forEach((p,i)=>{let b=0,bd=1e9;cs.forEach((q,j)=>{const dd=(p[0]-q[0])**2+(p[1]-q[1])**2+(p[2]-q[2])**2;if(dd<bd){bd=dd;b=j}});as[i]=b});
+      cs=cs.map((q,j)=>{let n=0,s=[0,0,0];px.forEach((p,i)=>{if(as[i]==j){n++;s[0]+=p[0];s[1]+=p[1];s[2]+=p[2]}});return n?s.map(v=>v/n):q})}
+    const cnt=new Array(K).fill(0);as.forEach(a=>cnt[a]++);
+    let list=cs.map((q,j)=>({rgb:q.map(Math.round),p:cnt[j]/px.length})).filter(z=>z.p>0).sort((a,b)=>b.p-a.p);
+    const tot={R:0,Y:0,B:0,W:0,K:0};
+    list.forEach(z=>{z.rc=ryb(...z.rgb);for(const k in tot)tot[k]+=z.rc[k]*z.p});
+    const sum=list.map(z=>{const[t,e]=name(...z.rgb);return `${t} ${Math.round(z.p*100)||'<1'}%`}).join(' · ');
+    const hex=r=>'#'+r.map(v=>v.toString(16).padStart(2,'0')).join('');
+    $('#o_c').classList.remove('hide');
+    $('#o_c').innerHTML=`<label style="margin-top:0">สรุปสี / Summary</label><div style="font-weight:700;line-height:1.6">${sum}</div>
+    <label>แม่สีที่ใช้ทั้งงาน / Primaries for the whole piece</label>${bar(tot)}
+    <div style="font-size:13px;line-height:1.7">${Object.entries(tot).map(([k,v])=>`<span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${PC[k][0]};border:1px solid #fff4"></span> ${PC[k][1]}/${PC[k][2]} <b>${Math.round(v*100)}%</b>`).join(' &nbsp; ')}</div>
+    <label>แต่ละสี / Each color</label>`+list.map(z=>{const[t,e]=name(...z.rgb);return `<div class="sw"><i style="background:${hex(z.rgb)}"></i><div style="flex:1"><b>${t} / ${e}</b> · ${Math.round(z.p*100)||'<1'}%<small>${hex(z.rgb).toUpperCase()}</small>${bar(z.rc)}<small>สูตรผสม: ${recipe(z.rc)}</small></div></div>`}).join('')+`<div class="sub" style="margin-top:10px">* ค่าประมาณแบบผสมสี แดง-เหลือง-น้ำเงิน + ขาว/ดำ · approximate RYB + white/black paint mix</div>`;
+    $('#o_c').scrollIntoView({behavior:'smooth'});
+  };im.src=refs.c;
+};
+
+// ---- stencil
+let stencilURL=null;
+function box(a,w,h){const o=new Float32Array(w*h);for(let y=1;y<h-1;y++)for(let q=1;q<w-1;q++){let t=0;for(let j=-1;j<=1;j++)for(let k=-1;k<=1;k++)t+=a[(y+j)*w+q+k];o[y*w+q]=t/9}return o}
+let SM=null;
+function runStencil(){
+  if(!refs.s)return;const im=new Image();im.onload=()=>{
+  const sc=Math.min(1,1400/Math.max(im.width,im.height)),w=Math.round(im.width*sc),h=Math.round(im.height*sc);
+  const c=$('#cv_s');c.width=w;c.height=h;c.classList.remove('hide');const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);
+  const d=x.getImageData(0,0,w,h),g=new Float32Array(w*h);
+  for(let i=0;i<w*h;i++)g[i]=.299*d.data[i*4]+.587*d.data[i*4+1]+.114*d.data[i*4+2];
+  const mode=$('#sm').value,thr=+$('#sr').value;let b=box(g,w,h);if(mode=='e')b=box(b,w,h);
+  let m=new Uint8Array(w*h);
+  if(mode=='a'){ // local-contrast: dark strokes vs neighbourhood
+    const I=new Float64Array((w+1)*(h+1));for(let y=0;y<h;y++){let r=0;for(let q=0;q<w;q++){r+=b[y*w+q];I[(y+1)*(w+1)+q+1]=I[y*(w+1)+q+1]+r}}
+    const R=Math.max(8,Math.round(w/45));
+    for(let y=0;y<h;y++)for(let q=0;q<w;q++){const x0=Math.max(0,q-R),x1=Math.min(w,q+R+1),y0=Math.max(0,y-R),y1=Math.min(h,y+R+1);
+      const mean=(I[y1*(w+1)+x1]-I[y0*(w+1)+x1]-I[y1*(w+1)+x0]+I[y0*(w+1)+x0])/((x1-x0)*(y1-y0));m[y*w+q]=(mean-b[y*w+q]>thr&&b[y*w+q]<200)?1:0}
+  }else for(let y=1;y<h-1;y++)for(let q=1;q<w-1;q++){const i=y*w+q;
+    if(mode=='e'){const gx=-b[i-w-1]+b[i-w+1]-2*b[i-1]+2*b[i+1]-b[i+w-1]+b[i+w+1],gy=-b[i-w-1]-2*b[i-w]-b[i-w+1]+b[i+w-1]+2*b[i+w]+b[i+w+1];m[i]=Math.hypot(gx,gy)/4>thr?1:0}
+    else m[i]=b[i]<thr*2?1:0}
+  // remove small specks (connected components)
+  const minS=+$('#sd').value;$('#sdv').textContent=minS;
+  if(minS>0){const seen=new Uint8Array(w*h),st=[];
+    for(let i=0;i<w*h;i++){if(!m[i]||seen[i])continue;const comp=[];st.push(i);seen[i]=1;
+      while(st.length){const p=st.pop();comp.push(p);const px=p%w,py=(p/w)|0;
+        for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=px+dx,ny=py+dy;if(nx<0||ny<0||nx>=w||ny>=h)continue;const n=ny*w+nx;if(m[n]&&!seen[n]){seen[n]=1;st.push(n)}}}
+      if(comp.length<minS)comp.forEach(p=>m[p]=0)}}
+  for(let n=0;n<+$('#st').value;n++){const o=m.slice();for(let y=1;y<h-1;y++)for(let q=1;q<w-1;q++){const i=y*w+q;if(o[i]||o[i-1]||o[i+1]||o[i-w]||o[i+w])m[i]=1}}
+  for(let i=0;i<w*h;i++){const v=m[i]?0:255;d.data[i*4]=d.data[i*4+1]=d.data[i*4+2]=v;d.data[i*4+3]=255}
+  x.putImageData(d,0,0);stencilURL=c.toDataURL('image/png');SM={m,w,h};$('#sv').textContent=thr};im.src=refs.s}
+function stURL(){if(!$('#stp').checked||!SM)return stencilURL;const{m,w,h}=SM,c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d'),d=x.createImageData(w,h);for(let i=0;i<w*h;i++)d.data[i*4+3]=m[i]?255:0;x.putImageData(d,0,0);return c.toDataURL('image/png')}
+['sr','sm','st','sd'].forEach(i=>$('#'+i).oninput=()=>{if(i=='sm')$('#sr').value={a:14,e:25,d:55}[$('#sm').value];runStencil()});
+$('#sdl').onclick=()=>{if(!stencilURL)return;const a=document.createElement('a');a.href=stURL();a.download='stencil.png';a.click()};
+$('#s2t').onclick=()=>{if(!stencilURL)return;refs.t=stencilURL;$('#i_t').src=stencilURL;$('#i_t').classList.remove('hide');document.querySelector('[data-t=t]').click()};
+$('#b_s').onclick=()=>{if(!refs.s){alert('อัปโหลดรูปก่อน / Upload first');return}
+  showOut('s','Convert the attached tattoo image into a clean tattoo stencil line drawing: crisp solid black outlines and key inner details only, pure white background, remove all colors, skin, shading, gradients and background. Keep the exact design and proportions. High resolution, print-ready.',null)};
+// ---- A4 tiling
+for(let i=1;i<=6;i++){$('#tc').add(new Option(i,i,i==2,i==2));$('#tr').add(new Option(i,i,i==2,i==2))}
+const tinfo=()=>{$('#tinfo').textContent=`${$('#tc').value*$('#tr').value} หน้า A4 · รวมประมาณ ${(+$('#tc').value*(210-2*$('#tm').value))/10} × ${(+$('#tr').value*(297-2*$('#tm').value))/10} cm`};
+['tc','tr','tm'].forEach(i=>$('#'+i).onchange=tinfo);tinfo();
+$('#b_t').onclick=()=>{
+  if(!refs.t){alert('อัปโหลดภาพก่อน / Upload first');return}
+  const im=new Image();im.onload=()=>{
+    const C=+$('#tc').value,R=+$('#tr').value,W=1240,H=1754,mp=Math.round(+$('#tm').value/210*W),w=W-2*mp,h=H-2*mp;
+    const TW=C*w,TH=R*h,sc=Math.min(TW/im.width,TH/im.height),dw=im.width*sc,dh=im.height*sc,ox=(TW-dw)/2,oy=(TH-dh)/2;
+    const o=$('#o_t');o.classList.remove('hide');o.innerHTML='<label style="margin-top:0">หน้าที่ตัดแล้ว / Pages (tap-hold or download)</label><div class="row" style="flex-wrap:wrap" id="tg"></div><button class="btn" id="dla">⬇️ ดาวน์โหลดทั้งหมด / Download all</button><div class="sub" style="margin-top:8px">พิมพ์ A4 100% ไม่ย่อ/ขยาย · Print at 100% scale. Fold lines: corner marks.</div>';
+    const links=[];let n=0;
+    for(let r=0;r<R;r++)for(let c=0;c<C;c++){n++;
+      const cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);
+      x.save();x.beginPath();x.rect(mp,mp,w,h);x.clip();x.drawImage(im,mp-c*w+ox,mp-r*h+oy,dw,dh);x.restore();
+      if(mp>=20){x.strokeStyle='#000';x.lineWidth=2;const L=mp*.6;[[mp,mp,-1,-1],[W-mp,mp,1,-1],[mp,H-mp,-1,1],[W-mp,H-mp,1,1]].forEach(([a,b,dx,dy])=>{x.beginPath();x.moveTo(a,b);x.lineTo(a+dx*L,b);x.moveTo(a,b);x.lineTo(a,b+dy*L);x.stroke()});
+        x.fillStyle='#555';x.font='22px sans-serif';x.fillText(`${n}/${C*R}  (แถว/row ${r+1}, คอลัมน์/col ${c+1})`,mp,mp*.55)}
+      const u=cv.toDataURL('image/png'),box=document.createElement('div');box.style.cssText='flex:0 0 31%;text-align:center;font-size:11px';
+      box.innerHTML=`<img src="${u}" style="width:100%;border:1px solid #444;background:#fff"><a download="a4-${n}-of-${C*R}.png" href="${u}" style="color:#fb923c">⬇️ ${n}</a>`;
+      $('#tg').append(box);links.push(box.querySelector('a'))}
+    $('#dla').onclick=()=>links.forEach((a,i)=>setTimeout(()=>a.click(),i*400));
+    o.scrollIntoView({behavior:'smooth'})};
+  im.src=refs.t};
+</script>
+</body>
+</html>
