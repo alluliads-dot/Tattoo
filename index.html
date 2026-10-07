@@ -61,6 +61,8 @@ img.pv{max-width:100%;border-radius:10px;margin-top:10px;display:block}
   <div class="sg pg" id="styles"></div>
   <label>โหมดสี / Color mode — สี · ขาวดำ · เส้นอย่างเดียว</label>
   <div class="chips" id="cmodes"></div>
+  <label>การจัดวาง / Composition</label>
+  <div class="chips" id="cpos"></div>
   <label>2. หัวข้อ / Subject</label>
   <div class="chips" id="subjc" style="margin-bottom:8px"></div>
   <input type="text" id="subj" placeholder="เช่น Japanese Dragon with Cherry Blossoms, เสือ, ปีศาจไกเกอร์ / demon faces">
@@ -195,7 +197,8 @@ function sample(sp){const c=document.createElement('canvas');c.width=200;c.heigh
   x.filter='none';return c}
 function styleCards(sel,list,specs,pick){const G=$(sel);list.forEach((n,i)=>{const d=document.createElement('button');d.className='pcd'+(i?'':' on');d.append(sample(specs[i]));d.append(n.replace(/ \/ | · /,'\n'));d.style.whiteSpace='pre-line';d.onclick=()=>{pick(i);$$(sel+' .pcd').forEach((y,j)=>y.classList.toggle('on',j==i))};G.append(d)})}
 styleCards('#styles',STYLES.map(x=>x[0]),[SPX.ir,SPX.re,SPX.mi,SPX.os,SPX.ge,SPX.tr,SPX.gb,SPX.gc],i=>{style=STYLES[i][1]});
-let cm='color';
+let cm='color',cp='dyn';
+[['dyn','🌀 ไดนามิก (แนะนำ) · Dynamic'],['sym','⚖️ สมมาตร · Symmetrical']].forEach(([k,t],i)=>{const b=document.createElement('button');b.className='chip'+(i?'':' on');b.textContent=t;b.onclick=()=>{cp=k;$$('#cpos .chip').forEach(x=>x.classList.toggle('on',x===b))};$('#cpos').append(b)});
 [['color','🎨 สี · Full color'],['bw','⚫ ขาวดำ · Black & grey'],['line','✏️ เส้นอย่างเดียว · Line art only']].forEach(([k,t],i)=>{const b=document.createElement('button');b.className='chip'+(i?'':' on');b.textContent=t;b.onclick=()=>{cm=k;$$('#cmodes .chip').forEach(x=>x.classList.toggle('on',x===b))};$('#cmodes').append(b)});
 ['มังกรญี่ปุ่น · Japanese dragon','เสือ · tiger','ฮันเนีย · Hannya mask','ซามูไร · samurai warrior','ปลาคาร์ป · koi fish with waves','ดอกโบตั๋น · peony flowers','กะโหลก · skull','ฟูโด · Fudo Myoo with flames','ปีศาจไกเกอร์ · Giger demon faces','พญานาค · naga serpent','ฟีนิกซ์ · phoenix'].forEach(t=>{const b=document.createElement('button');b.className='chip';b.textContent=t;b.onclick=()=>{$('#subj').value=t.split('·')[1].trim()};$('#subjc').append(b)});
 
@@ -219,7 +222,9 @@ $('#b_p').onclick=()=>{
   const mode=cm,MT={color:'Full color with a rich saturated palette and shading.',bw:'Black and grey only, no color, smooth wash shading and strong contrast.',line:'Clean black line art only: outlines and linework, no color, no fill, no shading, plain white background, stencil-ready.'};
   let st=style;if(mode=='color')st=st.replace(/black and grey /,'');else st=st.replace(/,? saturated acid-green.*$/,'').replace('full-color ','');
   const ln=mode=='line'&&/shading/.test($('#line').value)?'clean uniform black outlines':$('#line').value;
-  showOut('p',`Masterpiece ${st} tattoo design of ${s}, ${pl} placement, ${ln}, symmetrical balanced composition, tattoo studio portfolio quality, isolated on clean white background. ${MT[mode]} Aspect ratio ${ar}.`);
+  const dr=/dragon|มังกร|naga|พญานาค|serpent|snake|งู/i.test(s),cpt=cp=='sym'?'symmetrical balanced composition':'dynamic asymmetrical composition with a clear flow of movement',
+   guard=dr?'ONE single dragon with ONE continuous body, ONE head, ONE tail and four legs with three claws each; the body coils in a simple readable S-curve with a clearly visible head, whiskers and scales. Do not duplicate or mirror the body, no extra heads or tails, no merged limbs.':'Correct anatomy, a single main subject, no duplicated heads, limbs or tails.';
+  showOut('p',`Masterpiece ${st} tattoo design of ${s}, ${pl} placement, ${ln}, ${cpt}, tattoo studio portfolio quality, isolated on clean white background. ${MT[mode]} ${guard} Aspect ratio ${ar}.`);
 };
 $('#b_q').onclick=()=>{
   const p=$('#pose').value.trim();if(!p){alert('เลือกท่าหรือพิมพ์คำสั่ง / Pick a pose or type one');return}
