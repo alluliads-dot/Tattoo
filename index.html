@@ -65,6 +65,8 @@ img.pv{max-width:100%;border-radius:10px;margin-top:10px;display:block}
   <div class="chips" id="cpos"></div>
   <label>2. หัวข้อ / Subject</label>
   <div class="chips" id="subjc" style="margin-bottom:8px"></div>
+  <div class="sub" style="margin:0 0 6px">วรรณคดีไทย · Thai literature</div>
+  <div class="chips" id="subjt" style="margin-bottom:8px"></div>
   <input type="text" id="subj" placeholder="เช่น Japanese Dragon with Cherry Blossoms, เสือ, ปีศาจไกเกอร์ / demon faces">
   <label>3. ตำแหน่ง / Placement</label>
   <select id="place"><option>Full Back (เต็มหลัง)</option><option>Chest (หน้าอก)</option><option>Full Sleeve (เต็มแขน)</option><option>Forearm (ท่อนแขน)</option><option>Thigh (ต้นขา)</option><option>Calf (น่อง)</option><option>Shoulder (ไหล่)</option></select>
@@ -163,7 +165,9 @@ $$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.cla
 // ---- chips
 const STYLES=[['Irezumi / ญี่ปุ่น','Japanese Irezumi traditional'],['Realism / สมจริง','photorealistic black and grey realism'],['Minimalist / มินิมอล','minimalist fine-line'],['Old School / ออลสคูล','American old school traditional'],['Geometric / เรขาคณิต','geometric dotwork'],['Tribal / ชนเผ่า','tribal blackwork'],
 ['Giger ดำเทา / ไกเกอร์ปีศาจ','biomechanical H.R. Giger-style black and grey, tightly packed snarling demon faces with fangs, ribbed bone and tube forms, hollow cavities and dense smooth shading, glowing red eyes'],
-['Giger เขียวสด / ไกเกอร์สี','full-color Giger-style biomechanical demon design, saturated acid-green fill with crimson pink and orange mouths and eyeballs, blue segmented tubes and worms, fangs, dense all-over filling, bold dark outlines with thin white edge highlights']];
+['Giger เขียวสด / ไกเกอร์สี','full-color Giger-style biomechanical demon design, saturated acid-green fill with crimson pink and orange mouths and eyeballs, blue segmented tubes and worms, fangs, dense all-over filling, bold dark outlines with thin white edge highlights'],
+['ไทยลายกนก ขาวดำ / Thai ornate b&g','Thai traditional ornamental black and grey tattoo: ultra-detailed Thai kanok (lai kranok) filigree, temple-mural and temple-guardian figures crowned with ornate Thai jewelry and chada crowns, flame-like motifs, realistic muscle and fur shading'],
+['ไทยจิตรกรรม สีสด / Thai mural color','Thai Ramakien temple-mural style tattoo: crowned figures with ornate gold Thai jewelry and chada crowns, intricate Thai kanok filigree, flame and cloud motifs, mural-like outlines; palette: gold, vermilion red, emerald green and indigo blue']];
 let style=STYLES[0][1];
 const SPX={
 ir:{bg:'#111',cloud:1,face:'#c0392b',face2:'#7e1f17',horn:'#d4a017',eye:'#f5c04a',mouth:'#5a0f12',teeth:'#f4f1ea',line:'#000',lw:4},
@@ -178,7 +182,9 @@ gr:{bg:'#d9d9d9',face:'#b0b0b0',face2:'#3a3a3a',horn:'#555',eye:'#fff',mouth:'#2
 nj:{bg:'#111',cloud:1,face:'#ff4fa3',face2:'#3d7bff',horn:'#ffcc33',eye:'#ffee66',mouth:'#7a1a6d',teeth:'#fff',line:'#fff',lw:2},
 uk:{bg:'#e8dcc0',face:'#b4452f',face2:'#b4452f',horn:'#c9a24a',eye:'#e8dcc0',mouth:'#27386b',teeth:'#e8dcc0',line:'#27386b',lw:3},
 wc:{bg:'#fff',face:'#f08fb0',face2:'#7fb3e8',horn:'#f5d36b',eye:'#fff',mouth:'#c7518a',teeth:'#fff',line:'#555',lw:1.2,blur:1.5},
-gm:{bg:'#0f3d2e',face:'#1fa97a',face2:'#0c6b4d',horn:'#e3b73b',eye:'#e3b73b',mouth:'#8b1a1a',teeth:'#f7ecc8',line:'#e3b73b',lw:2}};
+gm:{bg:'#0f3d2e',face:'#1fa97a',face2:'#0c6b4d',horn:'#e3b73b',eye:'#e3b73b',mouth:'#8b1a1a',teeth:'#f7ecc8',line:'#e3b73b',lw:2},
+thb:{bg:'#d8d0c0',face:'#bdb7ab',face2:'#3a3835',horn:'#6a655d',eye:'#fff',mouth:'#1c1b1a',teeth:'#e8e4da',line:'#111',lw:2,crown:1},
+thc:{bg:'#7a1020',face:'#3fb27f',face2:'#1c7a52',horn:'#f5c242',eye:'#fff',mouth:'#c0141d',teeth:'#fff',line:'#2a1500',lw:3,crown:1}};
 function sample(sp){const c=document.createElement('canvas');c.width=200;c.height=200;const x=c.getContext('2d');
   x.fillStyle=sp.bg;x.fillRect(0,0,200,200);
   if(sp.cloud)[[20,30],[175,35],[25,170],[178,168]].forEach(([a,b])=>{x.fillStyle='#000';x.beginPath();x.arc(a,b,32,0,7);x.fill();x.strokeStyle=sp.line=='#fff'?'#fff':'#ddd';x.lineWidth=2;x.beginPath();x.arc(a,b,22,0,7);x.stroke()});
@@ -187,7 +193,9 @@ function sample(sp){const c=document.createElement('canvas');c.width=200;c.heigh
   const g=x.createLinearGradient(0,60,0,170);g.addColorStop(0,sp.face);g.addColorStop(1,sp.face2);
   x.lineWidth=sp.lw;x.strokeStyle=sp.line;x.lineJoin='round';
   if(sp.tubes){x.strokeStyle=sp.tubes;x.lineWidth=9;x.setLineDash([7,3]);[1,-1].forEach(d=>{const a=d>0?20:180;x.beginPath();x.moveTo(a,30);x.bezierCurveTo(a+d*60,80,a-d*20,130,a+d*45,190);x.stroke()});x.setLineDash([]);x.strokeStyle=sp.line;x.lineWidth=sp.lw}
-  x.fillStyle=sp.horn;[1,-1].forEach(d=>{x.beginPath();x.moveTo(100+d*30,62);x.lineTo(100+d*52,16);x.lineTo(100+d*58,66);x.closePath();x.fill();x.stroke()});
+  x.fillStyle=sp.horn;
+  if(sp.crown){x.beginPath();x.moveTo(62,70);x.lineTo(74,38);x.lineTo(86,44);x.lineTo(100,2);x.lineTo(114,44);x.lineTo(126,38);x.lineTo(138,70);x.closePath();x.fill();x.stroke();x.beginPath();x.moveTo(86,50);x.lineTo(114,50);x.moveTo(90,36);x.lineTo(110,36);x.moveTo(95,22);x.lineTo(105,22);x.stroke()}
+  else[1,-1].forEach(d=>{x.beginPath();x.moveTo(100+d*30,62);x.lineTo(100+d*52,16);x.lineTo(100+d*58,66);x.closePath();x.fill();x.stroke()});
   x.fillStyle=g;x.beginPath();x.ellipse(100,112,48,56,0,0,7);x.fill();x.stroke();
   [-1,1].forEach(d=>{x.fillStyle=sp.eye;x.beginPath();x.ellipse(100+d*22,98,13,8,d*.35,0,7);x.fill();x.stroke();x.fillStyle=sp.line;x.beginPath();x.arc(100+d*22,98,3.5,0,7);x.fill();x.beginPath();x.moveTo(100+d*8,86);x.lineTo(100+d*38,78);x.stroke()});
   x.beginPath();x.moveTo(100,104);x.lineTo(94,124);x.lineTo(106,124);x.closePath();x.stroke();
@@ -196,11 +204,12 @@ function sample(sp){const c=document.createElement('canvas');c.width=200;c.heigh
   if(sp.pattern=='tri'){x.strokeStyle='#111';x.lineWidth=1;for(let i=0;i<8;i++){x.beginPath();x.moveTo(20+i*22,192);x.lineTo(31+i*22,170);x.lineTo(42+i*22,192);x.stroke()}}
   x.filter='none';return c}
 function styleCards(sel,list,specs,pick){const G=$(sel);list.forEach((n,i)=>{const d=document.createElement('button');d.className='pcd'+(i?'':' on');d.append(sample(specs[i]));d.append(n.replace(/ \/ | · /,'\n'));d.style.whiteSpace='pre-line';d.onclick=()=>{pick(i);$$(sel+' .pcd').forEach((y,j)=>y.classList.toggle('on',j==i))};G.append(d)})}
-styleCards('#styles',STYLES.map(x=>x[0]),[SPX.ir,SPX.re,SPX.mi,SPX.os,SPX.ge,SPX.tr,SPX.gb,SPX.gc],i=>{style=STYLES[i][1]});
+styleCards('#styles',STYLES.map(x=>x[0]),[SPX.ir,SPX.re,SPX.mi,SPX.os,SPX.ge,SPX.tr,SPX.gb,SPX.gc,SPX.thb,SPX.thc],i=>{style=STYLES[i][1]});
 let cm='color',cp='dyn';
 [['dyn','🌀 ไดนามิก (แนะนำ) · Dynamic'],['sym','⚖️ สมมาตร · Symmetrical']].forEach(([k,t],i)=>{const b=document.createElement('button');b.className='chip'+(i?'':' on');b.textContent=t;b.onclick=()=>{cp=k;$$('#cpos .chip').forEach(x=>x.classList.toggle('on',x===b))};$('#cpos').append(b)});
 [['color','🎨 สี · Full color'],['bw','⚫ ขาวดำ · Black & grey'],['line','✏️ เส้นอย่างเดียว · Line art only']].forEach(([k,t],i)=>{const b=document.createElement('button');b.className='chip'+(i?'':' on');b.textContent=t;b.onclick=()=>{cm=k;$$('#cmodes .chip').forEach(x=>x.classList.toggle('on',x===b))};$('#cmodes').append(b)});
 ['มังกรญี่ปุ่น · Japanese dragon','เสือ · tiger','ฮันเนีย · Hannya mask','ซามูไร · samurai warrior','ปลาคาร์ป · koi fish with waves','ดอกโบตั๋น · peony flowers','กะโหลก · skull','ฟูโด · Fudo Myoo with flames','ปีศาจไกเกอร์ · Giger demon faces','พญานาค · naga serpent','ฟีนิกซ์ · phoenix'].forEach(t=>{const b=document.createElement('button');b.className='chip';b.textContent=t;b.onclick=()=>{$('#subj').value=t.split('·')[1].trim()};$('#subjc').append(b)});
+['หนุมาน · Hanuman, the white monkey warrior of the Thai Ramakien, crowned, fierce, holding a trident','ทศกัณฐ์ · Thotsakan, the ten-faced demon king of the Ramakien, crowned, in ornate armor','พระราม · Phra Ram, the Ramakien prince, drawing a bow, crowned','พระลักษมณ์ · Phra Lak, Ramakien warrior prince','สุครีพ · Sukhrip, the Ramakien monkey king','ยักษ์ทรงม้า · Thai giant (yaksha) warrior riding a horse, temple-mural style','อินทรชิต · Inthrachit, Ramakien demon prince on a chariot','นางสีดา · Nang Sida, Ramakien heroine in Thai classical dress','ครุฑ · Garuda with Thai kanok ornaments','กินรี · Kinnari, half-bird half-woman of Thai literature','คชสีห์ · Khotchasi, Thai mythical lion-elephant','พระอภัยมณี · Phra Aphai Mani playing the flute with the mermaid','พระสุธน-มโนราห์ · Prince Suthon and Manohra the kinnari','ขุนแผน · Khun Phaen, Thai folk-epic warrior'].forEach(t=>{const b=document.createElement('button');b.className='chip';b.textContent=t.split('·')[0].trim();b.onclick=()=>{$('#subj').value=t.split('·')[1].trim()};$('#subjt').append(b)});
 
 
 // ---- images
@@ -220,7 +229,7 @@ $('#b_p').onclick=()=>{
   const s=$('#subj').value.trim()||'Japanese Dragon with Cherry Blossoms',pl=$('#place').value.replace(/\s*\(.*\)/,''),ar=$('#ar').value;
   const ref=refs.p?' Use the attached image as the visual reference for composition and details.':'';
   const mode=cm,MT={color:'Full color with a rich saturated palette and shading.',bw:'Black and grey only, no color, smooth wash shading and strong contrast.',line:'Clean black line art only: outlines and linework, no color, no fill, no shading, plain white background, stencil-ready.'};
-  let st=style;if(mode=='color')st=st.replace(/black and grey /,'');else st=st.replace(/,? saturated acid-green.*$/,'').replace('full-color ','');
+  let st=style;if(mode=='color')st=st.replace(/black and grey /,'').replace('; palette:',', palette:');else st=st.replace(/,? saturated acid-green.*$/,'').replace('full-color ','').replace(/; palette:.*$/,'');
   const ln=mode=='line'&&/shading/.test($('#line').value)?'clean uniform black outlines':$('#line').value;
   const dr=/dragon|มังกร|naga|พญานาค|serpent|snake|งู/i.test(s),cpt=cp=='sym'?'symmetrical balanced composition':'dynamic asymmetrical composition with a clear flow of movement',
    guard=dr?'ONE single dragon with ONE continuous body, ONE head, ONE tail and four legs with three claws each; the body coils in a simple readable S-curve with a clearly visible head, whiskers and scales. Do not duplicate or mirror the body, no extra heads or tails, no merged limbs.':'Correct anatomy, a single main subject, no duplicated heads, limbs or tails.';
@@ -314,9 +323,10 @@ const CS=[['Irezumi คลาสสิก · Traditional','traditional Japanese 
 ['สีน้ำ · Watercolor','loose watercolor washes with soft bleeding edges and splashes of color while the line art stays visible'],
 ['ทอง-มรกต · Gold & emerald','rich gold, emerald green and deep teal armor tones with crimson accents and ivory highlights, metallic sheen'],
 ['Giger ดำเทา+ตาแดง · Giger b&g, red eyes','black and grey biomechanical Giger look: deep charcoal shading with smooth gradients, bone, rib and tube textures, glowing red eyes as the only color'],
-['Giger เขียวสด · Giger acid-green','Thai-style full-color Giger: saturated acid-green fill across the whole design, hot pink and crimson mouths and eyeballs, orange glow inside the teeth, blue segmented tubes and worms, bold dark outlines with thin white edge highlights']];
+['Giger เขียวสด · Giger acid-green','Thai-style full-color Giger: saturated acid-green fill across the whole design, hot pink and crimson mouths and eyeballs, orange glow inside the teeth, blue segmented tubes and worms, bold dark outlines with thin white edge highlights'],
+['ไทยจิตรกรรม · Thai mural','Thai temple-mural palette: gold leaf, vermilion red, emerald green, indigo blue and cream, flat mural-style fills with fine gold kanok line detail on jewelry and crowns']];
 let kcs=0;
-styleCards('#kstyles',CS.map(c=>c[0]),[SPX.ir,SPX.gr,SPX.nj,SPX.os,SPX.uk,SPX.wc,SPX.gm,SPX.gb,SPX.gc],i=>{kcs=i});
+styleCards('#kstyles',CS.map(c=>c[0]),[SPX.ir,SPX.gr,SPX.nj,SPX.os,SPX.uk,SPX.wc,SPX.gm,SPX.gb,SPX.gc,SPX.thc],i=>{kcs=i});
 $('#b_k').onclick=()=>{
   const n=$('#kn').value.trim(),keep=$('#kl').value=='keep';
   showOut('k',`Colorize the attached sketch / black-and-white tattoo design. Keep the exact composition, anatomy and subject. ${keep?'Do NOT redraw or change any line; only add color and shading inside and behind the existing lines.':'You may slightly refine and thicken lines to suit the style.'} Color style: ${CS[kcs][1]}. Background: ${$('#kb').value}.${n?' Color instructions: '+n+'.':''} Tattoo-ready, high resolution, clean edges, no text, no watermark.`,null);
